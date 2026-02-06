@@ -1,0 +1,44 @@
+﻿@model Paynow.Sdk.Models.PaymentStatusResponse
+
+<div class="container mt-5">
+    <h2>Szczegóły płatności</h2>
+
+    @if (ViewBag.Message != null)
+    {
+        <div class="alert alert-success">@ViewBag.Message</div>
+    }
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">ID Płatności: @Model.PaymentId</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Zewnętrzne ID: @Model.ExternalId</h6>
+            <p class="card-text">
+                Status: <strong class="text-uppercase @(Model.Status == "CONFIRMED" ? "text-success" : "text-warning")">@Model.Status</strong>
+            </p>
+            <a href="/" class="btn btn-secondary">Wróć do strony głównej</a>
+            <a href="@Url.Action("PaymentReturn", new { paymentId = Model.PaymentId })" class="btn btn-info">Odśwież status</a>
+        </div>
+    </div>
+
+    @if (Model.Status == "CONFIRMED")
+    {
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">Strefa Zwrotów (Refund)</div>
+            <div class="card-body">
+                <p>Możesz wykonać częściowy lub pełny zwrot tej płatności.</p>
+                <form asp-action="Refund" method="post" class="row g-3">
+                    <input type="hidden" name="paymentId" value="@Model.PaymentId" />
+
+                    <div class="col-auto">
+                        <label class="visually-hidden">Kwota w groszach</label>
+                        <input type="number" name="amount" class="form-control" placeholder="Kwota (grosze!)" value="100">
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-danger mb-3">Wykonaj Zwrot</button>
+                    </div>
+                </form>
+                <small class="text-muted">Uwaga: Wpisz kwotę w groszach (np. 100 = 1.00 PLN)</small>
+            </div>
+        </div>
+    }
+</div>

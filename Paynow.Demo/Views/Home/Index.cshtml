@@ -1,0 +1,24 @@
+﻿@{
+    ViewData["Title"] = "Demo Paynow";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Test Płatności Paynow</h1>
+    <p>Wypełnij formularz, aby rozpocząć transakcję testową.</p>
+
+    <div class="card p-4 mt-4" style="max-width: 500px; margin: 0 auto;">
+        <form asp-action="CreatePayment" method="post">
+            <div class="mb-3 text-start">
+                <label class="form-label">Kwota (PLN)</label>
+                <input type="number" name="amountPln" class="form-control" value="10" required />
+            </div>
+
+            <div class="mb-3 text-start">
+                <label class="form-label">Email kupującego</label>
+                <input type="email" name="email" class="form-control" value="jan.kowalski@example.com" required />
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg w-100">Zapłać z Paynow</button>
+        </form>
+    </div>
+</div>
