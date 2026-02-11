@@ -18,5 +18,12 @@ namespace Paynow.Sdk.Models
         [JsonPropertyName("locale")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Locale { get; set; } // np. "pl-PL"
+        [JsonPropertyName("externalId")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? ExternalId { get; set; }
+
+        [JsonPropertyName("deviceFingerprint")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? DeviceFingerprint { get; set; }
     }
 }

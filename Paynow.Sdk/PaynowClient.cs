@@ -55,6 +55,69 @@ namespace Paynow.Sdk
             return await SendRequestAsync<RefundResponse>(HttpMethod.Post, $"/v3/payments/{paymentId}/refunds", jsonBody, idempotencyKey);
         }
 
+        public async Task<List<PaymentMethodsResponse>?> GetSavedPaymentMethodsAsync(string externalBuyerId)
+        {
+            if (string.IsNullOrEmpty(externalBuyerId)) throw new ArgumentNullException(nameof(externalBuyerId));
+
+            var path = $"/v3/payments/paymentmethods/saved?externalBuyerId={externalBuyerId}";
+
+            return await SendRequestAsync<List<PaymentMethodsResponse>>(HttpMethod.Get, path, "");
+        }
+
+        public async Task RemoveSavedPaymentMethodAsync(string token, string externalBuyerId, string? idempotencyKey = null)
+        {
+            if (string.IsNullOrEmpty(token)) throw new ArgumentNullException(nameof(token));
+            if (string.IsNullOrEmpty(externalBuyerId)) throw new ArgumentNullException(nameof(externalBuyerId));
+
+            var path = $"/v3/payments/paymentmethods/saved?paymentMethodToken={token}&externalBuyerId={externalBuyerId}";
+
+            await SendRequestNoResultAsync(HttpMethod.Delete, path, "", idempotencyKey);
+        }
+
+        // --- Metoda pomocnicza dla requestów bez zwracanego body (np. DELETE) ---
+        private async Task SendRequestNoResultAsync(HttpMethod method, string path, string jsonBody, string? idempotencyKey = null)
+        {
+            var request = new HttpRequestMessage(method, path);
+            idempotencyKey ??= Guid.NewGuid().ToString();
+
+            var headersForSignature = new Dictionary<string, string>
+            {
+                { "Api-Key", _options.ApiKey },
+                { "Idempotency-Key", idempotencyKey }
+            };
+
+            var queryParams = ExtractQueryParams(path);
+
+            var signature = SignatureCalculator.Calculate(
+                _options.SignatureKey,
+                jsonBody,
+                headersForSignature,
+                queryParams
+            );
+
+            request.Headers.Add("Api-Key", _options.ApiKey);
+            request.Headers.Add("Idempotency-Key", idempotencyKey);
+            request.Headers.Add("Signature", signature);
+            request.Headers.Add("Accept", "application/json");
+
+            if (!string.IsNullOrEmpty(jsonBody))
+            {
+                request.Content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+            }
+
+            var response = await _httpClient.SendAsync(request);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                throw new HttpRequestException($"Paynow API Error: {response.StatusCode}. Details: {errorContent}");
+            }
+
+        }
+        public async Task<List<Notice>?> GetDataProcessingNoticesAsync(string locale = "pl-PL")
+        {
+            return await SendRequestAsync<List<Notice>>(HttpMethod.Get, $"/v3/payments/dataprocessing/notices?locale={locale}", "");
+        }
         public bool VerifySignature(string signatureFromHeader, string bodyString, IDictionary<string, string> headers)
         {
             try
@@ -112,7 +175,24 @@ namespace Paynow.Sdk
             if (!response.IsSuccessStatusCode)
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
-                throw new HttpRequestException($"Paynow API Error: {response.StatusCode}. Details: {errorContent}");
+
+                try
+                {
+                    // Próbujemy sparsować błąd do obiektu
+                    var errorObj = JsonSerializer.Deserialize<PaynowErrorResponse>(errorContent, _jsonOptions);
+
+                    // Rzucamy nasz typowany wyjątek
+                    throw new PaynowException(
+                        (int)response.StatusCode,
+                        errorObj?.Errors,
+                        errorContent
+                    );
+                }
+                catch (JsonException)
+                {
+                    // Jeśli to nie był JSON (np. błąd 500 serwera), rzucamy standardowy wyjątek
+                    throw new HttpRequestException($"Paynow API Fatal Error: {response.StatusCode}. Content: {errorContent}");
+                }
             }
 
             var result = await response.Content.ReadFromJsonAsync<T>(_jsonOptions);

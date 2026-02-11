@@ -12,5 +12,8 @@ namespace Paynow.Sdk.Models
 
         [JsonPropertyName("externalId")]
         public string ExternalId { get; set; }
+
+        [JsonPropertyName("paymentMethodToken")]
+        public string? PaymentMethodToken { get; set; }
     }
 }

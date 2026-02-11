@@ -23,5 +23,8 @@ namespace Paynow.Sdk.Models
         [JsonPropertyName("paymentMethodId")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? PaymentMethodId { get; set; }
+        [JsonPropertyName("paymentMethodToken")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? PaymentMethodToken { get; set; }
     }
 }

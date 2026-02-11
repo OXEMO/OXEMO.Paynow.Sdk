@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Elementy rozwiązania/">
+    <File Path="README.md" />
+  </Folder>
   <Project Path="Paynow.Demo/Paynow.Demo.csproj" />
   <Project Path="Paynow.Sdk/Paynow.Sdk.csproj" />
 </Solution>
