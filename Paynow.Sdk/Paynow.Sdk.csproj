@@ -7,11 +7,11 @@
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 
 		<PackageId>OXEMO.Paynow.Sdk</PackageId>
-		<Version>1.0.2</Version>
+		<Version>1.0.3</Version>
 		<Authors>KRML</Authors>
 		<Company>OXEMO</Company>
 		<Product>Paynow .NET SDK</Product>
-		<PackageReleaseNotes>Naprawiono błędy weryfikacji podpisu i serializacji JSON. Dodano obsługę tokenizacji kart (subskrypcje), zarządzanie zapisanymi metodami płatności oraz typowane wyjątki.</PackageReleaseNotes>
+		<PackageReleaseNotes>Dopasowano tokenizację kart do aktualnej dokumentacji Paynow: poprawiono endpointy metod płatności i usuwania karty, dodano SavedInstruments (tokeny kart) oraz uodporniono deserializację liczb. Dodano GetPaymentDetailsAsync(string) i zaktualizowano README.md.</PackageReleaseNotes>
 		<Description>Nieoficjalne SDK dla bramki płatniczej Paynow (mBank/mElements) dla .NET. Obsługuje API v3.</Description>
 		<PackageTags>paynow;payments;bramka;płatności;sdk;dotnet</PackageTags>
 

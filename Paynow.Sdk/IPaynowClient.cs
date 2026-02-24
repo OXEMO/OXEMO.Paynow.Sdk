@@ -15,6 +15,11 @@ namespace Paynow.Sdk
         /// Pobiera status płatności.
         /// </summary>
         Task<PaymentStatusResponse?> GetPaymentStatusAsync(string paymentId);
+
+        /// <summary>
+        /// Pobiera szczegóły płatności (payment details).
+        /// </summary>
+        Task<PaymentDetailsResponse?> GetPaymentDetailsAsync(string paymentId);
         bool VerifySignature(string signatureFromHeader, string bodyString, IDictionary<string, string> headers);
         /// <summary>
         /// Zleca zwrot środków.

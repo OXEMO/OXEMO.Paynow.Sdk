@@ -15,6 +15,12 @@
             <p class="card-text">
                 Status: <strong class="text-uppercase @(Model.Status == "CONFIRMED" ? "text-success" : "text-warning")">@Model.Status</strong>
             </p>
+            @if (!string.IsNullOrWhiteSpace(Model.PaymentMethodToken))
+            {
+                <p class="card-text">
+                    Token metody płatności: <code>@Model.PaymentMethodToken</code>
+                </p>
+            }
             <a href="/" class="btn btn-secondary">Wróć do strony głównej</a>
             <a href="@Url.Action("PaymentReturn", new { paymentId = Model.PaymentId })" class="btn btn-info">Odśwież status</a>
         </div>

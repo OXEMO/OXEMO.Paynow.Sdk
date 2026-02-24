@@ -29,7 +29,8 @@ namespace Paynow.Sdk
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                WriteIndented = false
+                WriteIndented = false,
+                NumberHandling = JsonNumberHandling.AllowReadingFromString
             };
 
             if (_httpClient.BaseAddress == null)
@@ -49,6 +50,13 @@ namespace Paynow.Sdk
             return await SendRequestAsync<PaymentStatusResponse>(HttpMethod.Get, $"/v3/payments/{paymentId}/status", "");
         }
 
+        public async Task<PaymentDetailsResponse?> GetPaymentDetailsAsync(string paymentId)
+        {
+            if (string.IsNullOrEmpty(paymentId)) throw new ArgumentNullException(nameof(paymentId));
+
+            return await SendRequestAsync<PaymentDetailsResponse>(HttpMethod.Get, $"/v3/payments/{paymentId}", "");
+        }
+
         public async Task<RefundResponse?> CreateRefundAsync(string paymentId, RefundRequest request, string? idempotencyKey = null)
         {
             var jsonBody = JsonSerializer.Serialize(request, _jsonOptions);
@@ -59,7 +67,7 @@ namespace Paynow.Sdk
         {
             if (string.IsNullOrEmpty(externalBuyerId)) throw new ArgumentNullException(nameof(externalBuyerId));
 
-            var path = $"/v3/payments/paymentmethods/saved?externalBuyerId={externalBuyerId}";
+            var path = $"/v3/payments/paymentmethods?externalBuyerId={externalBuyerId}";
 
             return await SendRequestAsync<List<PaymentMethodsResponse>>(HttpMethod.Get, path, "");
         }
@@ -69,7 +77,7 @@ namespace Paynow.Sdk
             if (string.IsNullOrEmpty(token)) throw new ArgumentNullException(nameof(token));
             if (string.IsNullOrEmpty(externalBuyerId)) throw new ArgumentNullException(nameof(externalBuyerId));
 
-            var path = $"/v3/payments/paymentmethods/saved?paymentMethodToken={token}&externalBuyerId={externalBuyerId}";
+            var path = $"/v3/payments/paymentmethods/saved?externalBuyerId={externalBuyerId}&token={token}";
 
             await SendRequestNoResultAsync(HttpMethod.Delete, path, "", idempotencyKey);
         }
